@@ -7,6 +7,7 @@ FIRMWARE_VERSION		?= firmware-imx-8.0
 
 FIRMWARE_PATH			?= $(ROOT)/$(FIRMWARE_VERSION)
 FLASH_BIN_PATH			?= $(ROOT)/imx-mkimage/iMX8M
+LINUX_PATH			?= $(ROOT)/linux
 LPDDR_BIN_PATH			?= $(FIRMWARE_PATH)/firmware/ddr/synopsys
 MKIMAGE_PATH			?= $(ROOT)/imx-mkimage
 TF_A_PATH			?= $(ROOT)/trusted-firmware-a
@@ -25,8 +26,8 @@ PLATFORM ?= imx8mq
 ################################################################################
 # Targets
 ################################################################################
-all: tfa u-boot
-clean: mkimage-clean tfa-clean u-boot-clean
+all: linux tfa u-boot
+clean: linux-clean mkimage-clean tfa-clean u-boot-clean
 dist-clean: clean setup-clean
 
 include toolchain.mk
@@ -43,6 +44,19 @@ mkimage: u-boot tfa ddr-firmware
 mkimage-clean:
 	cd $(MKIMAGE_PATH) && git clean -xdf
 	rm $(ROOT)/mkimage_imx8
+
+
+################################################################################
+# Linux kernel
+################################################################################
+linux-defconfig:
+	make -C $(LINUX_PATH) ARCH=arm64 imx_v8_defconfig
+
+linux: linux-defconfig
+	make -C $(LINUX_PATH) ARCH=arm64 -j`nproc` CROSS_COMPILE="$(CCACHE)$(AARCH64_CROSS_COMPILE)" Image dtbs
+
+linux-clean:
+	cd $(LINUX_PATH) && git clean -xdf
 
 ################################################################################
 # Trusted Firmware A
@@ -118,7 +132,7 @@ flash: mkimage
 	@echo "    !!! WARNING !!!     !!! WARNING !!!     !!! WARNING !!!"
 	@echo "  Be careful to pick the correct name, since this will wipe the entire disc!"; \
 		read -p "  name? " DISC; \
-		echo "  You selected \"$$DISC\", correct? Otherwise hit ctrl+c withing 5 seconds";  \
+		echo "  You selected \"$$DISC\", correct? Otherwise hit ctrl+c within 5 seconds";  \
 		sleep 5; \
 		echo "  execute this command manually:"; \
 	        echo "  sudo dd if=$(FLASH_BIN) of=/dev/$$DISC bs=1k seek=33 conv=fsync"
