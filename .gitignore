@@ -5,3 +5,4 @@ mkimage_imx8
 out/
 toolchains/
 firmware-imx-8.0*
+imx8mqevk.img
