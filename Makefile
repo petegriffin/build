@@ -118,14 +118,6 @@ u-boot-cscope:
 ################################################################################
 # Setup
 ################################################################################
-setup: clone ddr-firmware
-
-setup-clean:
-	rm -rf ./$(FIRMWARE_VERSION)*
-
-clone:
-	git submodule update --init --recursive --jobs 8
-
 # This is prebuilt binaries by NXP, download them and use them. Update path if
 # it changes in the future.
 ddr-firmware:
