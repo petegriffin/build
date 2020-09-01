@@ -5,6 +5,7 @@ CCACHE ?= $(shell which ccache) # Don't remove this comment (space is needed)
 
 FIRMWARE_VERSION		?= firmware-imx-8.0
 
+BUILD_PATH			?= $(ROOT)/build
 FIRMWARE_PATH			?= $(ROOT)/$(FIRMWARE_VERSION)
 FLASH_BIN_PATH			?= $(ROOT)/imx-mkimage/iMX8M
 LINUX_PATH			?= $(ROOT)/linux
@@ -49,10 +50,18 @@ mkimage-clean:
 ################################################################################
 # Linux kernel
 ################################################################################
-linux-defconfig:
-	make -C $(LINUX_PATH) ARCH=arm64 imx_v8_defconfig
+LINUX_DEFCONFIG_FILES := $(LINUX_PATH)/arch/arm64/configs/imx_v8_defconfig \
+			 $(BUILD_PATH)/kconfigs/imx8.conf
 
-linux: linux-defconfig
+#linux-defconfig:
+#	make -C $(LINUX_PATH) ARCH=arm64 imx_v8_defconfig
+
+$(LINUX_PATH)/.config: $(LINUX_DEFCONFIG_FILES)
+	cd $(LINUX_PATH) && \
+                ARCH=arm64 \
+                scripts/kconfig/merge_config.sh $(LINUX_DEFCONFIG_FILES)
+
+linux: $(LINUX_PATH)/.config
 	make -C $(LINUX_PATH) ARCH=arm64 -j`nproc` CROSS_COMPILE="$(CCACHE)$(AARCH64_CROSS_COMPILE)" Image dtbs
 
 linux-clean:
