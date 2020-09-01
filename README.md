@@ -74,6 +74,106 @@ $ make flash-bootloader
 ```
 Type the last row (a `dd` command) to flash the bootloader to your device.
 
+# TFTP
+## Setup the tftp server
+Credits to the author of [this](https://developer.ridgerun.com/wiki/index.php?title=Setting_Up_A_Tftp_Service)
+guide.
+```
+sudo apt install xinetd tftpd tftp
+```
+
+```
+$ sudo vim /etc/xinetd.d/tftp
+```
+and paste
+
+```
+service tftp
+{
+    protocol        = udp
+    port            = 69
+    socket_type     = dgram
+    wait            = yes
+    user            = nobody
+    server          = /usr/sbin/in.tftpd
+    server_args     = /srv/tftp
+    disable         = no
+}
+```
+Save the file and exit.
+
+Create the directory
+```
+$ sudo mkdir /srv/tftp
+$ sudo chmod -R 777 /srv/tftp
+$ sudo chown -R nobody /srv/tftp
+```
+
+Start tftpd through xinetd
+
+```
+sudo /etc/init.d/xinetd restart
+```
+
+## Symlink kernel and dtb
+```
+$ cd /srv/tftp
+$ ln -s <project_path>/imx8mqevk/linux/arch/arm64/boot/Image .
+$ ln -s <project_path>/imx8mqevk/linux/arch/arm64/boot/dts/freescale/imx8mq-evk.dtb fsl-imx8mq-evk.dtb
+```
+
+## Boot up
+Make sure you have an SD-card with at least the bootloader on it (minimum
+`compile` and `flash bootloader only`). Plug in the Ethernet cable to the
+IMX8MQ device, then turn on the device and halt U-Boot when it is counting
+down, then run:
+```
+u-boot=> run netboot
+```
+
+# NFS
+
+## Setup the NFS server
+```
+$ sudo apt install nfs-kernel-server
+```
+
+## Create a rootfs locally
+A simple way is to take a Buildroot rootfs and put it locally, something like:
+```
+$ mkdir -p /srv/nfs/imx
+$ buildroot/output/images/
+$ tar xvf <project_path>/imx8mqevk/buildroot/output/images/rootfs.tar -C /srv/nfs/imx
+```
+
+## Edit exports
+```
+$ sudo vim /etc/exports
+```
+and paste
+```
+/srv/nfs/imx 192.168.1.0/24(rw,sync,no_root_squash,no_subtree_check)
+```
+then restart
+```
+$ sudo exportfs -a
+$ sudo systemctl restart nfs-kernel-server
+```
+
+## Configure U-boot
+This only has to be done once! Boot up the device and halt U-Boot when it's
+counting down (use the ip-address from your local computer running the tftp
+server)
+```
+u-boot=> setenv serverip 192.168.1.110
+u-boot=> setenv nfsroot /srv/nfs/imx
+```
+
+## Boot the device
+```
+u-boot=> run netboot
+```
+
 
 // Joakim Bech
 Last updated: 2020-09-01
