@@ -17,6 +17,7 @@ U-BOOT_PATH			?= $(ROOT)/u-boot
 # Binaries
 FIRMWARE_BIN			?= firmware-imx-8.0.bin
 FLASH_BIN			?= $(FLASH_BIN_PATH)/flash.bin
+IMX8_IMAGE			?= $(BUILD_PATH)/imx8mqevk.img
 
 # URLs
 FIRMWARE_BIN_URL		?= https://www.nxp.com/lgfiles/NMG/MAD/YOCTO/$(FIRMWARE_BIN)
@@ -28,8 +29,8 @@ PLATFORM ?= imx8mq
 # Targets
 ################################################################################
 all: linux tfa u-boot mkimage
-clean: linux-clean mkimage-clean tfa-clean u-boot-clean
-dist-clean: clean setup-clean
+clean: flash-image linux-clean mkimage-clean tfa-clean u-boot-clean
+dist-clean: clean ddr-firmare-clean
 
 include toolchain.mk
 
@@ -124,10 +125,30 @@ ddr-firmware:
 	@if [ ! -f "$(FIRMWARE_BIN)" ]; then wget $(FIRMWARE_BIN_URL); fi
 	@if [ ! -d "$(FIRMWARE_PATH)" ]; then chmod 711 $(FIRMWARE_BIN) && ./$(FIRMWARE_BIN) --auto-accept; fi
 
+ddr-firmware-clean:
+	rm -rf $(FIRMWARE_BIN) $(FIRMWARE_PATH)
+
 ################################################################################
 # flash
 ################################################################################
-flash: mkimage
+# Intentionally left out targets, since I want this to only flash. It's up to
+# the user to run make before running make flash-image
+flash-image:
+	@rm -f $(IMX8_IMAGE)
+	@cd $(BUILD_PATH) && ./create_image.sh
+	@echo ""
+	@echo "Devices / disks available on the local computer"
+	@lsblk -d -o "NAME,SIZE"
+	@echo ""
+	@echo "Run:"
+	@echo " sudo dd if=$(IMX8_IMAGE) | pv | sudo dd of=<sd-card-device> bs=1M conv=fsync"
+	@echo " <sd-card-device> should be replaced with something like /dev/sdj for example"
+
+flash-image-clean:
+	rm -f $(IMX8_IMAGE)
+
+
+flash-bootloader: mkimage
 	@lsblk -d -o "NAME,SIZE"
 	@echo "\n  Find the name of your SD-card and type that below:"
 	@echo "    !!! WARNING !!!     !!! WARNING !!!     !!! WARNING !!!"

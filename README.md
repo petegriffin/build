@@ -38,11 +38,11 @@ computer.
 
 ## Create and write a complete image
 This will create a complete image ready to flash to a SD-card using `dd`. The
-script will require `sudo` access.
+script will require `sudo` access. Note that, you must run a normal `make` once
+to compile all the binaries used before being able to run the command below.
 
 ```
-$ cd build
-$ ./create_image.sh
+$ make flash-image
 ```
 This will create an image file called `imx8mqevk.img` that contains the
 bootloader (U-boot, put at offset 33), a boot disk (Linux kernel and DTB) and
@@ -57,10 +57,10 @@ got. I.e., something with `/dev/sdX` or `/dev/mmcblk[n]`. Use that device as
 part of the `... of=<device>` in the command below. There we're using
 `/dev/sdj`. Note when flashing the complete image you should use the device name
 and not device name + partition number. I.e., `/dev/sdj` is correct, `/dev/sdj1`
-is incorrect.
+is incorrect. The `make flash-image` will give an example also.
 
 ```
-$ sudo dd if=imx8mqevk.img | pv | sudo dd of=/dev/sdj bs=1M conv=fsync
+$ sudo dd if=build/imx8mqevk.img | pv | sudo dd of=/dev/sdj bs=1M conv=fsync
 ```
 
 Note! If you need more space for the rootfs, simply change the size in the
@@ -70,9 +70,9 @@ Note! If you need more space for the rootfs, simply change the size in the
 This flash directly to the SD-card. So after inserting the SD-card into your
 computer, run:
 ```
-$ make flash
+$ make flash-bootloader
 ```
-Type the last row (a `dd` command) to flash your device.
+Type the last row (a `dd` command) to flash the bootloader to your device.
 
 
 // Joakim Bech
