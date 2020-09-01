@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 IMAGENAME=imx8mqevk.img
-IMAGESIZE=4G
+IMAGESIZE=256M
 
 BOOT_IMG_PATH=/media/boot
 ROOTFS_PATH=/media/rootfs
@@ -26,8 +26,7 @@ sudo mkfs.ext4 /dev/mapper/loop0p2
 sudo mkdir -p $BOOT_IMG_PATH
 sudo mount /dev/mapper/loop0p1 $BOOT_IMG_PATH
 sudo cp ../linux/arch/arm64/boot/Image $BOOT_IMG_PATH
-sudo cp ../linux/arch/arm64/boot/dts/freescale/imx8mq-evk.dtb $BOOT_IMG_PATH
-sudo cp ../imx-mkimage/iMX8M/fsl-imx8mq-evk.dtb $BOOT_IMG_PATH
+sudo cp ../linux/arch/arm64/boot/dts/freescale/imx8mq-evk.dtb $BOOT_IMG_PATH/fsl-imx8mq-evk.dtb
 sudo umount $BOOT_IMG_PATH
 
 # Put rootfs at the root fs partition

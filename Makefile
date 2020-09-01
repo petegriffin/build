@@ -27,7 +27,7 @@ PLATFORM ?= imx8mq
 ################################################################################
 # Targets
 ################################################################################
-all: linux tfa u-boot
+all: linux tfa u-boot mkimage
 clean: linux-clean mkimage-clean tfa-clean u-boot-clean
 dist-clean: clean setup-clean
 
@@ -44,7 +44,7 @@ mkimage: u-boot tfa ddr-firmware
 #> +generate flash.bin.
 mkimage-clean:
 	cd $(MKIMAGE_PATH) && git clean -xdf
-	rm $(ROOT)/mkimage_imx8
+	rm -f $(ROOT)/mkimage_imx8
 
 
 ################################################################################
