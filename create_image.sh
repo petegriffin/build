@@ -10,7 +10,7 @@ ROOTFS_PATH=/media/rootfs
 truncate -s $IMAGESIZE $IMAGENAME
 
 # Create a partition table
-echo -ne "16384 64M 7\n147456 + 83\n" | sudo /usr/sbin/sfdisk $IMAGENAME
+echo -ne "16384 64M 7\n147456 + 83\n" | sudo sfdisk $IMAGENAME
 
 echo "If nothing seems to happen, then it's waiting for sudo password ..."
 sleep 2
@@ -26,7 +26,7 @@ sudo mkfs.ext4 /dev/mapper/loop0p2
 sudo mkdir -p $BOOT_IMG_PATH
 sudo mount /dev/mapper/loop0p1 $BOOT_IMG_PATH
 sudo cp ../linux/arch/arm64/boot/Image $BOOT_IMG_PATH
-sudo cp ../linux/arch/arm64/boot/dts/freescale/imx8mq-evk.dtb $BOOT_IMG_PATH/fsl-imx8mq-evk.dtb
+sudo cp ../linux/arch/arm64/boot/dts/freescale/imx8mq-evk.dtb $BOOT_IMG_PATH/imx8mq-evk.dtb
 sudo umount $BOOT_IMG_PATH
 
 # Put rootfs at the root fs partition
