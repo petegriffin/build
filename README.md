@@ -5,7 +5,7 @@ don't have to use Yocto etc.
 # Prerequisites
 ```
 $ apt install coreutils dosfstools e2fsprogs fdisk git kpartx pv sudo \
-              util-linux wget
+              util-linux wget device-tree-compiler
 ```
 
 # Setup
