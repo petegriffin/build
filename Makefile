@@ -51,8 +51,7 @@ mkimage-clean:
 ################################################################################
 # Linux kernel
 ################################################################################
-LINUX_DEFCONFIG_FILES := $(LINUX_PATH)/arch/arm64/configs/imx_v8_defconfig \
-			 $(BUILD_PATH)/kconfigs/imx8.conf
+LINUX_DEFCONFIG_FILES := $(LINUX_PATH)/arch/arm64/configs/defconfig
 
 #linux-defconfig:
 #	make -C $(LINUX_PATH) ARCH=arm64 imx_v8_defconfig
