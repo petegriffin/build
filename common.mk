@@ -105,6 +105,9 @@ QEMU_VIRTFS_MOUNTPOINT	?= /mnt/host
 
 # End of QEMU shared folder settings
 
+# Directory used to create socket files used by VMMs
+QEMU_VIRTIO_SOCKET_DIR ?= /tmp/
+
 ################################################################################
 # Mandatory for autotools (for specifying --host)
 ################################################################################
@@ -399,6 +402,25 @@ QEMU_EXTRA_ARGS +=\
 	  -fsdev local,id=fsdev1,path=$(QEMU_PSS_HOST_DIR),security_model=none \
 	  -device virtio-9p-device,fsdev=fsdev1,mount_tag=secure
 endif
+endif
+ifeq ($(QEMU_VIRTRPMB_ENABLE),y)
+QEMU_EXTRA_ARGS +=\
+	  -device vhost-user-rpmb-pci,chardev=vrpmb,id=rpmb \
+	  -chardev socket,path=$(QEMU_VIRTIO_SOCKET_DIR)/vrpmb.sock,id=vrpmb
+endif
+ifeq ($(QEMU_VIRTVIDEO_ENABLE),y)
+QEMU_EXTRA_ARGS +=\
+	  -device vhost-user-video-pci,chardev=video,id=video \
+	  -chardev socket,path=$(QEMU_VIRTIO_SOCKET_DIR)/video.sock,id=video
+endif
+ifeq ($(QEMU_VHOSTUSER_MEM),y)
+QEMU_EXTRA_ARGS +=\
+	  -object memory-backend-file,id=mem,size=1G,mem-path=/dev/shm,share=on \
+	  -numa node,memdev=mem
+endif
+ifeq ($(QEMU_VIRTDEBUG_ENABLE),y)
+QEMU_DEBUG_ARGS +=\
+	  --debug -v
 endif
 
 ifeq ($(GDBSERVER),y)
