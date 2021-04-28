@@ -151,7 +151,7 @@ linux-defconfig: $(LINUX_PATH)/.config
 LINUX_COMMON_FLAGS += ARCH=arm64 Image
 
 linux: linux-common
-	$(MAKE) -C $(LINUX_PATH) $(LINUX_COMMON_FLAGS) modules
+	$(MAKE) -C $(LINUX_PATH) $(LINUX_COMMON_FLAGS) scripts_gdb modules
 	$(MAKE) -C $(LINUX_PATH) $(LINUX_COMMON_FLAGS) modules INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=$(MODULE_OUTPUT) modules_install
 	mkdir -p $(BINARIES_PATH)
 	ln -sf $(LINUX_PATH)/arch/arm64/boot/Image $(BINARIES_PATH)
