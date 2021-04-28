@@ -108,6 +108,8 @@ QEMU_VIRTFS_MOUNTPOINT	?= /mnt/host
 # Directory used to create socket files used by VMMs
 QEMU_VIRTIO_SOCKET_DIR ?= /tmp/
 
+
+
 ################################################################################
 # Mandatory for autotools (for specifying --host)
 ################################################################################
@@ -422,10 +424,15 @@ ifeq ($(QEMU_VIRTDEBUG_ENABLE),y)
 QEMU_DEBUG_ARGS +=\
 	  --debug -v
 endif
+ifeq ($(QEMU_GDB_ENABLE),y)
+# disable kaslr of the kernel to get symbolic debugging with gdb
+QEMU_GDB_BOOTARGS ?= nokaslr
+endif
 
 ifeq ($(GDBSERVER),y)
 HOSTFWD := ,hostfwd=tcp::12345-:12345
 endif
+
 # Enable QEMU SLiRP user networking
 QEMU_EXTRA_ARGS +=\
 	-netdev user,id=vmnic$(HOSTFWD) -device virtio-net-device,netdev=vmnic
