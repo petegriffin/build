@@ -39,6 +39,8 @@ endif
 EDK2_BIN		?= $(EDK2_PATH)/Build/ArmVirtQemuKernel-$(EDK2_ARCH)/$(EDK2_BUILD)_$(EDK2_TOOLCHAIN)/FV/QEMU_EFI.fd
 QEMU_PATH		?= $(ROOT)/qemu
 SOC_TERM_PATH		?= $(ROOT)/soc_term
+MODULE_OUTPUT		?= $(ROOT)/module_output
+
 
 ################################################################################
 # Targets
@@ -149,6 +151,8 @@ linux-defconfig: $(LINUX_PATH)/.config
 LINUX_COMMON_FLAGS += ARCH=arm64 Image
 
 linux: linux-common
+	$(MAKE) -C $(LINUX_PATH) $(LINUX_COMMON_FLAGS) modules
+	$(MAKE) -C $(LINUX_PATH) $(LINUX_COMMON_FLAGS) modules INSTALL_MOD_STRIP=1 INSTALL_MOD_PATH=$(MODULE_OUTPUT) modules_install
 	mkdir -p $(BINARIES_PATH)
 	ln -sf $(LINUX_PATH)/arch/arm64/boot/Image $(BINARIES_PATH)
 
